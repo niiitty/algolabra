@@ -1,0 +1,26 @@
+[project]
+name = "algolabra"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Niko Typpö",email = "niko.typpo@protonmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+]
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pylint (>=4.0.5,<5.0.0)",
+    "autopep8 (>=2.3.2,<3.0.0)",
+    "pytest (>=9.0.2,<10.0.0)"
+]
