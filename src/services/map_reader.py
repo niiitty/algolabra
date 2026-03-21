@@ -1,9 +1,11 @@
 import re
+from pathlib import Path
 
 
 class MapReader:
     def __init__(self, map_file=None):
-        self.map_file = map_file
+        if map_file:
+            self.read(map_file)
 
     def read(self, map_file):
         self.map_file = map_file
@@ -13,8 +15,11 @@ class MapReader:
         Muuntaa map-tiedoston sanakirjaksi. Sanakirja sisältää kartan pituuden, leveyden sekä 
         kartan matriisina.
         """
-        with open(self.map_file, "r", encoding="utf-8") as f:
-            file = f.read().strip()
+        if Path(self.map_file).is_file():
+            with open(self.map_file, "r", encoding="utf-8") as f:
+                file = f.read().strip()
+        else:
+            file = str(self.map_file).strip()
 
         map_dict = {
             "height": self._height(file),

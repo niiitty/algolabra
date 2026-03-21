@@ -32,15 +32,6 @@ class AStar:
                     neighbours.append((nx, ny))
         return neighbours
 
-    def _draw_path(self, path):
-        grid = self.grid
-        for move in path:
-            x, y = move
-            grid[x][y] = "/"
-
-        for row in grid:
-            print("".join(row))
-
     def a_star_search(self, start: tuple, goal: tuple):
         came_from = {}
         g_score = {start: 0}
@@ -50,7 +41,6 @@ class AStar:
             current = min(f_score, key=f_score.get)
             if current == goal:
                 path = self._reconstruct_path(came_from, current)
-                self._draw_path(path)
                 return path
 
             f_score.pop(current)

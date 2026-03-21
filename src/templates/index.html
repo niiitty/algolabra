@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    Käytetty aika: {{ time }} <br />
+    {% if path %}
+      Reitin pituus: {{ length }}
+      <h3>Reitti</h3>
+      {{ path }}
+    {% endif %}
+
+
+    <div>
+      <form action="/" method="post" enctype="multipart/form-data">
+        <label for="map-file">Syötä map-tiedosto</label><br />
+        <input
+          type="file"
+          id ="map-file"
+          name="map-file"
+          accept=".map"
+          required />
+
+        <input type="number" id="start-x" name="start-x" placeholder="Lähtö X" required />
+        <input type="number" id="start-y" name="start-y" placeholder="Lähtö Y" required />
+        <input type="number" id="goal-x" name="goal-x" placeholder="Maali X" required />
+        <input type="number" id="goal-y" name="goal-y" placeholder="Maali Y" required />
+
+        <button type="submit">Suorita</button>
+      </form>
+    </div>
+
+    {% if image %}
+    <pre>
+      {% for row in image %}{{ row }}
+      {% endfor %}
+    </pre>
+    {% endif %}
+  </body>
+</html>
