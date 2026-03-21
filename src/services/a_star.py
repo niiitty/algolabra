@@ -1,13 +1,17 @@
+from math import sqrt
+
+
 class AStar:
     def __init__(self, map: dict):
         self.height = map["height"]
         self.width = map["width"]
         self.grid = map["grid"]
 
-    def _cost_estimate(self, node, goal):  # Tsebyshev-etäisyys
+    def _cost_estimate(self, node, goal):
+        "Heurestiikkafunktio. Euklidinen etäisyys."
         x1, y1 = node
         x2, y2 = goal
-        return max(abs(x2 - x1), abs(y2 - y1))
+        return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
