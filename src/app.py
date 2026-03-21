@@ -34,10 +34,8 @@ def index():
 
     if request.method == "POST":
         map_file = request.files.get("map-file")
-        sx, sy = int(request.form.get("start_x")), int(
-            request.form.get("start_y"))
-        gx, gy = int(request.form.get("goal_x")), int(
-            request.form.get("goal_y"))
+        sx, sy = int(request.form.get("start-x")), int(request.form.get("start-y"))
+        gx, gy = int(request.form.get("goal-x")), int(request.form.get("goal-y"))
 
         file_content = map_file.read().decode("utf-8")
         reader = MapReader(file_content)
