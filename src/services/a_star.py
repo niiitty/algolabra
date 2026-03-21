@@ -1,6 +1,3 @@
-import heapq
-
-
 class AStar:
     def __init__(self, map: dict):
         self.height = map["height"]
@@ -45,14 +42,11 @@ class AStar:
             print("".join(row))
 
     def a_star_search(self, start: tuple, goal: tuple):
-        open_set = []  # keko
-        heapq.heappush(open_set, start)
-
         came_from = {}
         g_score = {start: 0}
         f_score = {start: self._cost_estimate(start, goal)}
 
-        while open_set:
+        while f_score:
             current = min(f_score, key=f_score.get)
             if current == goal:
                 path = self._reconstruct_path(came_from, current)
@@ -60,7 +54,6 @@ class AStar:
                 return path
 
             f_score.pop(current)
-            heapq.heappop(open_set)
 
             neighbouring_nodes = self._neighbours(current)
 
@@ -77,8 +70,5 @@ class AStar:
                     g_score[neighbour] = tentative_g_score
                     f_score[neighbour] = tentative_g_score + \
                         self._cost_estimate(neighbour, goal)
-
-                    if neighbour not in open_set:
-                        heapq.heappush(open_set, neighbour)
 
         return False
