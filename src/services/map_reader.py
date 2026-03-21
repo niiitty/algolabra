@@ -1,5 +1,5 @@
 import re
-from pathlib import Path
+from werkzeug.datastructures import FileStorage
 
 
 class MapReader:
@@ -15,11 +15,11 @@ class MapReader:
         Muuntaa map-tiedoston sanakirjaksi. Sanakirja sisältää kartan pituuden, leveyden sekä 
         kartan matriisina.
         """
-        if Path(self.map_file).is_file():
+        if isinstance(self.map_file, FileStorage):
+            file = self.map_file.read().decode("utf-8").strip()
+        else:
             with open(self.map_file, "r", encoding="utf-8") as f:
                 file = f.read().strip()
-        else:
-            file = str(self.map_file).strip()
 
         map_dict = {
             "height": self._height(file),

@@ -37,8 +37,7 @@ def index():
         sx, sy = int(request.form.get("start-x")), int(request.form.get("start-y"))
         gx, gy = int(request.form.get("goal-x")), int(request.form.get("goal-y"))
 
-        file_content = map_file.read().decode("utf-8")
-        reader = MapReader(file_content)
+        reader = MapReader(map_file)
         map_dict = reader.convert()
 
         if map_dict["grid"][sx][sy] != "." or map_dict["grid"][gx][gy] != ".":
