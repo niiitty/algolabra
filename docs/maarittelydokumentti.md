@@ -6,7 +6,7 @@ muita kieliä en hallitse riittävästi.
 
 ## Aihe
 
-Harjoitustyön aiheena on toteuttaa kaksi reitinhakualgoritmia sekä vertailla niitä. Ohjelmaan syötetään map-tiedosto ja palauttaa algoritmein tulokset, kuten reitin pituus sekä käytetty aika.
+Harjoitustyön aiheena on toteuttaa kaksi reitinhakualgoritmia sekä vertailla niitä. Ohjelmaan syötetään map-tiedosto ja palauttaa algoritmein tulokset, kuten reitin pituus sekä käytetty aika. Vertailussa karttoina käytetään [Moving AI lab -sivulta](https://www.movingai.com/benchmarks/grids.html) saatuja ei-sokkelomaisia karttoja (esim. Warcraft III).
 
 ## Algoritmit
 Työssä käytettävät algoritmit sekä niiden ensisijaiset lähteet.
