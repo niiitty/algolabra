@@ -16,17 +16,23 @@ class TestAStar(unittest.TestCase):
                 ['.', '.', '.', 'T', '.', 'T', '.', '.', '.', '.'],
                 ['.', '.', '.', 'T', 'T', 'T', '.', '.', '.', '.'],
                 ['.', '.', '.', '.', 'T', '.', '.', '.', '.', '.'],
-                ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
-                ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+                ['.', '.', '.', '.', 'T', '.', '.', '.', '.', '.'],
+                ['.', '.', '.', '.', 'T', '.', '.', '.', '.', '.'],
                 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.']
             ]}
         self.a_star = AStar(self.input_dict)
 
-    def test_correct_path_length(self):
-        start = (7, 0)
-        goal = (4, 7)
+    def test_correct_path_length_open(self):
+        start = (0, 0)
+        goal = (2, 9)
         path = self.a_star.a_star_search(start, goal)
-        self.assertEqual(len(path), 9)
+        self.assertEqual(len(path), 10)
+
+    def test_correct_path_length_obstacle(self):
+        start = (8, 0)
+        goal = (7, 7)
+        path = self.a_star.a_star_search(start, goal)
+        self.assertEqual(len(path), 8)
 
     def test_no_path_found(self):
         start = (5, 4)
