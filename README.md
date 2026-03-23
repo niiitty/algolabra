@@ -6,6 +6,8 @@
 ## Viikkoraportit
 [Viikko 1](docs/viikkoraportit/viikko-1.md)
 
+[Viikko 2](docs/viikkoraportit/viikko-2.md)
+
 ## Käyttöohje
 
 Kloonaa repositorio koneellesi. Lataa projektin riippuvuudet komennolla 
