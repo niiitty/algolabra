@@ -8,10 +8,11 @@ class AStar:
         self.grid = map["grid"]
 
     def _cost_estimate(self, node, goal):
-        "Heurestiikkafunktio. Euklidinen etäisyys."
-        x1, y1 = node
-        x2, y2 = goal
-        return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        "Heurestiikkafunktio. Oktiilietäisyys."
+        xn, yn = node
+        xg, yg = goal
+
+        return (abs(xg - xn) + abs(yg - yn)) + (1.414 - 2) * min(abs(xg - xn), abs(yg - yn))
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
@@ -57,7 +58,7 @@ class AStar:
                 if neighbour not in f_score:
                     f_score[neighbour] = float("inf")
 
-                tentative_g_score = g_score[current]
+                tentative_g_score = g_score[current] + self._cost_estimate(current, neighbour)
 
                 if tentative_g_score < g_score[neighbour]:
                     came_from[neighbour] = current
