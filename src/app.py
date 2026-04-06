@@ -4,6 +4,7 @@ from flask import Flask, render_template, request
 
 from services.map_reader import MapReader
 from services.a_star import AStar
+from services.jump_point_search import JumpPointSearch
 
 
 app = Flask(__name__)
@@ -45,12 +46,16 @@ def index():
                 "Joko lähtö- tai maalipiste ei ole kuljettavissa.")
 
         start_time = time.time()
-        path = AStar(map_dict).a_star_search((sx, sy), (gx, gy))
+        #path = AStar(map_dict).a_star_search((sx, sy), (gx, gy))
+        path, res_map = JumpPointSearch(map_dict).jump_point_search((sx, sy), (gx, gy))
         end_time = time.time()
         total_time = end_time - start_time
 
         if path:
-            image = draw_path(map_dict["grid"], path, (sx, sy), (gx, gy))
+            image = draw_path(res_map, path, (sx, sy), (gx, gy))
+        else:
+            image = ["".join(row) for row in res_map]
+            path = []
 
         return render_template("index.html",
                                path=path,

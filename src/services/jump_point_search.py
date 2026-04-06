@@ -1,8 +1,26 @@
+from enum import Enum
+
+
+class Directions(Enum):
+    VERTICAL = (-1, 0), (1, 0)
+    HORIZONTAL = (0, -1), (0, 1)
+    DIAGONAL = (1, 1), (1, -1), (-1, 1), (-1, -1)
+
+
 class JumpPointSearch:
     def __init__(self, map: dict):
         self.height = map["height"]
         self.width = map["width"]
         self.grid = map["grid"]
+        self.drawn_map = [row[:] for row in map["grid"]]
+
+    def _cost_estimate(self, node, goal):
+        "Heurestiikkafunktio. Oktiilietäisyys."
+        xn, yn = node
+        xg, yg = goal
+
+        return (abs(xg - xn) + abs(yg - yn)) + \
+            (1.414 - 2) * min(abs(xg - xn), abs(yg - yn))
 
     def _neighbours(self, node):
         x, y = node
@@ -19,26 +37,179 @@ class JumpPointSearch:
                     neighbours.append((nx, ny))
         return neighbours
 
+    def _reconstruct_path(self, came_from: dict, current, start, goal) -> list:
+        jump_points = [current]
+        while came_from.get(current) is not None:
+            current = came_from[current]
+            jump_points.append(current)
 
-    def identify_successor(self, node, start, goal):
-        successors = []
-        neigbours = self._neighbours(node)
-        for n in neigbours:
-            #n = self.jump(x, direction(x, n), s, g)
-            successors.append(n)
-        return successors
+        total_path = []
 
-    def jump(self, node, direction, start, goal):
-        neighbours = self._neighbours(n)
-        if n not in neighbours:
+        for i in range(len(jump_points)):
+            if jump_points[i] == current:
+                total_path.append((x, y))
+                self.drawn_map[start[0]][start[1]] = "S"
+                self.drawn_map[goal[0]][goal[1]] = "G"
+                return total_path[::-1]
+
+            direction = self._get_direction(jump_points[i], jump_points[i + 1])
+            x, y = jump_points[i]
+            while (x, y) != jump_points[i + 1]:
+                total_path.append((x, y))
+                x += direction[0]
+                y += direction[1]
+                self.drawn_map[x][y] = "/"
+
+    def _in_bounds(self, x, y) -> bool:
+        return 0 <= x < self.height and 0 <= y < self.width
+
+    def _is_blocked(self, x, y) -> bool:
+        if not self._in_bounds(x, y):
+            return True
+        return self.grid[x][y] != "."
+
+    def _get_direction(self, from_node: tuple, to_node: tuple) -> tuple:
+        fx, fy = from_node
+        tx, ty = to_node
+        dx, dy = tx - fx, ty - fy
+
+        if dy < 0:
+            dy = -1
+        elif dy > 0:
+            dy = 1
+        else:
+            dy = 0
+
+        if dx < 0:
+            dx = -1
+        elif dx > 0:
+            dx = 1
+        else:
+            dx = 0
+
+        return dx, dy
+
+    def _prune(self, parent: tuple, current: tuple) -> list:
+        if not parent or parent == current:
+            return self._neighbours(current)
+
+        cx, cy = current
+        dx, dy = self._get_direction(parent, current)
+
+        pruned_neighbours = []
+
+        if dx != 0 and dy == 0:  # pysty
+            pruned_neighbours.append((cx + dx, cy))
+            if self._is_blocked(
+                    cx, cy + 1) and not self._is_blocked(cx + dx, cy + 1):
+                pruned_neighbours.append((cx + dx, cy + 1))
+            if self._is_blocked(
+                    cx, cy - 1) and not self._is_blocked(cx + dx, cy - 1):
+                pruned_neighbours.append((cx + dx, cy - 1))
+
+        elif dx == 0 and dy != 0:  # vaaka
+            pruned_neighbours.append((cx, cy + dy))
+            if self._is_blocked(
+                    cx + 1, cy) and not self._is_blocked(cx + 1, cy + dy):
+                pruned_neighbours.append((cx + 1, cy + dy))
+            if self._is_blocked(
+                    cx - 1, cy) and not self._is_blocked(cx - 1, cy + dy):
+                pruned_neighbours.append((cx - 1, cy + dy))
+
+        elif dx != 0 and dy != 0:  # vino
+            pruned_neighbours.append((cx + dx, cy + dy))
+            pruned_neighbours.append((cx + dx, cy))
+            pruned_neighbours.append((cx, cy + dy))
+
+            if self._is_blocked(
+                    cx - dx, cy) and not self._is_blocked(cx - dx, cy + dy):
+                pruned_neighbours.append((cx - dx, cy + dy))
+            if self._is_blocked(
+                    cx, cy - dy) and not self._is_blocked(cx + dx, cy - dy):
+                pruned_neighbours.append((cx + dx, cy - dy))
+
+        return pruned_neighbours
+
+# -+ 0+ ++
+# -0 00 +0
+# -- 0- +-
+
+    def _has_forced_neighbour(self, node: tuple, direction):
+        x, y = node
+        if direction in Directions.VERTICAL.value:
+            dx = direction[0]
+            if (self._is_blocked(x, y + 1) and not self._is_blocked(x + dx, y + 1)
+                ) or (self._is_blocked(x, y - 1) and not self._is_blocked(x + dx, y - 1)):
+                return True
+        elif direction in Directions.HORIZONTAL.value:
+            dy = direction[1]
+            if (self._is_blocked(x + 1, y) and not self._is_blocked(x + 1, y + dy)
+                ) or (self._is_blocked(x - 1, y) and not self._is_blocked(x - 1, y + dy)):
+                return True
+        elif direction in Directions.DIAGONAL.value:
+            dx, dy = direction
+            if (self._is_blocked(x - dx, y) and not self._is_blocked(x - dx, y + dy)
+                ) or (self._is_blocked(x, y - dy) and not self._is_blocked(x + dx, y - dy)):
+                return True
+
+        return False
+
+    def _jump(self, node: tuple, direction: tuple, start: tuple, goal: tuple):
+        "Rekursiivisesti etsii hyppypisteitä."
+        n = node[0] + direction[0], node[1] + direction[1]
+        if n not in self._neighbours(node):
             return None
-        n = step(node, direction)
         if n == goal:
+            self.drawn_map[n[0]][n[1]] = "x"
             return n
-        #if n in neighbours so that n' is forced
-        #   return n
-        if d is diagonal:
-            for i in [1,2]:
-                if self.jump(n, d(i), start, goal):
+        if self._has_forced_neighbour(n, direction):
+            self.drawn_map[n[0]][n[1]] = "x"
+            return n
+        if direction in Directions.DIAGONAL.value:
+            # ne kaksi suuntaa johon mennään vinosuunnassa, huom tuplen arvot
+            # kertovat nämä
+            for d_i in ((direction[0], 0), (0, direction[1])):
+                if self._jump(n, d_i, start, goal):
+                    self.drawn_map[n[0]][n[1]] = "x"
                     return n
-        return self.jump(n, d, start, goal)
+        self.drawn_map[n[0]][n[1]] = ":"
+        return self._jump(n, direction, start, goal)
+
+    def jump_point_search(self, start: tuple, goal: tuple):
+        came_from = {start: None}
+        g_score = {start: 0}
+        f_score = {start: self._cost_estimate(start, goal)}
+        jump_points = set()
+        jump_points.add(start)
+
+        while jump_points:
+            current = min(f_score, key=f_score.get)
+            if current == goal:
+                path = self._reconstruct_path(came_from, current, start, goal)
+                return path, self.drawn_map
+
+            for node in self._prune(came_from[current], current):
+                direction = self._get_direction(current, node)
+                found_jump_points = self._jump(current, direction, start, goal)
+                if found_jump_points:
+                    jump_points.add(found_jump_points)
+
+            for f in jump_points:
+                if f not in g_score:
+                    g_score[f] = float("inf")
+                if f not in f_score:
+                    f_score[f] = float("inf")
+
+                tentative_g_score = g_score[current] + \
+                    self._cost_estimate(current, f)
+
+                if tentative_g_score < g_score[f]:
+                    came_from[f] = current
+                    g_score[f] = tentative_g_score
+                    f_score[f] = tentative_g_score + \
+                        self._cost_estimate(f, goal)
+
+            f_score.pop(current)
+            jump_points.remove(current)
+
+        return None, self.drawn_map
