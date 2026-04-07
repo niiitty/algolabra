@@ -3,7 +3,13 @@
   <head>
     <meta charset="utf-8" />
   </head>
+
   <body>
+
+    {% if error %}
+      <p><strong>Virhe:</strong> {{ error }}</p>
+    {% endif %}
+
     Käytetty aika: {{ time }} <br />
     {% if path %}
       Reitin pituus: {{ length }}
@@ -22,10 +28,15 @@
           accept=".map"
           required />
 
-        <input type="number" id="start-x" name="start-x" placeholder="Lähtö Y" required />
-        <input type="number" id="start-y" name="start-y" placeholder="Lähtö X" required />
-        <input type="number" id="goal-x" name="goal-x" placeholder="Maali Y" required />
-        <input type="number" id="goal-y" name="goal-y" placeholder="Maali X" required />
+        <input type="number" id="start-x" name="start-x" value="{{ filled.sx }}" placeholder="Lähtö X" required />
+        <input type="number" id="start-y" name="start-y" value="{{ filled.sy }}" placeholder="Lähtö Y" required />
+        <input type="number" id="goal-x" name="goal-x" value="{{ filled.gx }}" placeholder="Maali X" required />
+        <input type="number" id="goal-y" name="goal-y" value="{{ filled.gy }}" placeholder="Maali Y" required />
+
+        <input type="radio" id="A*" name="algorithm" value="A*" required/>
+        <label for="A*">A*-haku</label>
+        <input type="radio" id="JPS" name="algorithm" value="JPS" required/>
+        <label for="JPS">Hyppypistehaku (JPS)</label>
 
         <button type="submit">Suorita</button>
       </form>

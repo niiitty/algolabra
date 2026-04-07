@@ -9,5 +9,5 @@
 | Viikonpäivä | Tuntia käytetty |
 | --------    | -------         |
 | Maanantai   | 6               |
-|             |                 |
-| Yhteensä    | 6               |
+| Tiistai     | 1,5             |
+| Yhteensä    | 6,5             |
