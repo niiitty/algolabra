@@ -10,4 +10,5 @@
 | --------    | -------         |
 | Maanantai   | 6               |
 | Tiistai     | 1,5             |
-| Yhteensä    | 6,5             |
+| Torstai     | 2,5             |
+| Yhteensä    | 12              |

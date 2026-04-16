@@ -25,7 +25,7 @@ class JumpPointSearch:
     def _neighbours(self, node):
         x, y = node
         directions = [
-            (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)
+            (-1, 0), (1, 0), (0, -1), (0, 1), (-1, 1), (1, -1), (1, 1), (-1, -1)
         ]
 
         neighbours = []
@@ -154,7 +154,7 @@ class JumpPointSearch:
 
         return False
 
-    def _jump(self, node: tuple, direction: tuple, start: tuple, goal: tuple):
+    def _jump(self, node: tuple, direction: tuple, start: tuple, goal: tuple) -> tuple | None:
         "Rekursiivisesti etsii hyppypisteitä."
         n = node[0] + direction[0], node[1] + direction[1]
         if n not in self._neighbours(node):
@@ -188,28 +188,26 @@ class JumpPointSearch:
                 path = self._reconstruct_path(came_from, current, start, goal)
                 return path, self.drawn_map
 
+            jump_points.remove(current)
+            f_score.pop(current)
+
             for node in self._prune(came_from[current], current):
                 direction = self._get_direction(current, node)
-                found_jump_points = self._jump(current, direction, start, goal)
-                if found_jump_points:
-                    jump_points.add(found_jump_points)
+                found = self._jump(current, direction, start, goal)
+                if found:
+                    jump_points.add(found)
+                    if found not in g_score:
+                        g_score[found] = float("inf")
+                    if found not in f_score:
+                        f_score[found] = float("inf")
 
-            for f in jump_points:
-                if f not in g_score:
-                    g_score[f] = float("inf")
-                if f not in f_score:
-                    f_score[f] = float("inf")
+                    tentative_g_score = g_score[current] + \
+                        self._cost_estimate(current, found)
 
-                tentative_g_score = g_score[current] + \
-                    self._cost_estimate(current, f)
-
-                if tentative_g_score < g_score[f]:
-                    came_from[f] = current
-                    g_score[f] = tentative_g_score
-                    f_score[f] = tentative_g_score + \
-                        self._cost_estimate(f, goal)
-
-            f_score.pop(current)
-            jump_points.remove(current)
+                    if tentative_g_score < g_score[found]:
+                        came_from[found] = current
+                        g_score[found] = tentative_g_score
+                        f_score[found] = tentative_g_score + \
+                            self._cost_estimate(found, goal)
 
         return None, self.drawn_map
