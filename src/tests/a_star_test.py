@@ -1,5 +1,6 @@
 import unittest
 from src.services.a_star import AStar
+from src.utils.grid_tools import GridTools
 
 
 class TestAStar(unittest.TestCase):
@@ -20,7 +21,7 @@ class TestAStar(unittest.TestCase):
                 ['.', '.', '.', '.', 'T', '.', '.', '.', '.', '.'],
                 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.']
             ]}
-        self.a_star = AStar(self.input_dict)
+        self.a_star = AStar(GridTools(self.input_dict))
 
     def test_correct_path_length_open(self):
         start = (0, 0)

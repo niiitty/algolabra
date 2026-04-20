@@ -5,6 +5,7 @@ from flask import Flask, render_template, request
 from services.map_reader import MapReader
 from services.a_star import AStar
 from services.jump_point_search import JumpPointSearch
+from utils.grid_tools import GridTools
 
 
 app = Flask(__name__)
@@ -51,14 +52,16 @@ def index():
             error = "Joko lähtö- tai maalipiste ei ole kuljettavissa."
             return render_template("index.html", error=error, filled=filled)
 
+        map_data = GridTools(map_dict)
+
         if request.form.get("algorithm") == "A*":
             start_time = time.time()
-            path = AStar(map_dict).a_star_search(start, goal)
+            path = AStar(map_data).a_star_search(start, goal)
             res_map = map_dict["grid"]
         else:
             start_time = time.time()
             path, res_map = JumpPointSearch(
-                map_dict).jump_point_search(start, goal)
+                map_data).jump_point_search(start, goal)
 
         end_time = time.time()
         total_time = end_time - start_time

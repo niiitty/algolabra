@@ -1,18 +1,6 @@
-from math import sqrt
-
-
 class AStar:
-    def __init__(self, map: dict):
-        self.height = map["height"]
-        self.width = map["width"]
-        self.grid = map["grid"]
-
-    def _cost_estimate(self, node, goal):
-        "Heurestiikkafunktio. Oktiilietäisyys."
-        xn, yn = node
-        xg, yg = goal
-
-        return (abs(xg - xn) + abs(yg - yn)) + (1.414 - 2) * min(abs(xg - xn), abs(yg - yn))
+    def __init__(self, grid):
+        self.grid = grid        
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
@@ -22,25 +10,10 @@ class AStar:
 
         return total_path[::-1]
 
-    def _neighbours(self, node):
-        x, y = node
-        directions = [
-            (-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)
-        ]
-
-        neighbours = []
-
-        for dir_x, dir_y in directions:
-            nx, ny = x + dir_x, y + dir_y
-            if 0 <= nx < self.height and 0 <= ny < self.width:
-                if self.grid[nx][ny] == ".":
-                    neighbours.append((nx, ny))
-        return neighbours
-
     def a_star_search(self, start: tuple, goal: tuple):
         came_from = {}
         g_score = {start: 0}
-        f_score = {start: self._cost_estimate(start, goal)}
+        f_score = {start: self.grid.cost_estimate(start, goal)}
 
         while f_score:
             current = min(f_score, key=f_score.get)
@@ -50,7 +23,7 @@ class AStar:
 
             f_score.pop(current)
 
-            neighbouring_nodes = self._neighbours(current)
+            neighbouring_nodes = self.grid.neighbours(current)
 
             for neighbour in neighbouring_nodes:
                 if neighbour not in g_score:
@@ -58,12 +31,12 @@ class AStar:
                 if neighbour not in f_score:
                     f_score[neighbour] = float("inf")
 
-                tentative_g_score = g_score[current] + self._cost_estimate(current, neighbour)
+                tentative_g_score = g_score[current] + self.grid.cost_estimate(current, neighbour)
 
                 if tentative_g_score < g_score[neighbour]:
                     came_from[neighbour] = current
                     g_score[neighbour] = tentative_g_score
                     f_score[neighbour] = tentative_g_score + \
-                        self._cost_estimate(neighbour, goal)
+                        self.grid.cost_estimate(neighbour, goal)
 
         return False

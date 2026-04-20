@@ -1,5 +1,6 @@
 import unittest
 from src.services.jump_point_search import JumpPointSearch
+from src.utils.grid_tools import GridTools
 
 
 class TestJumpPointSearch(unittest.TestCase):
@@ -20,7 +21,7 @@ class TestJumpPointSearch(unittest.TestCase):
                 ['.', '.', '.', '.', 'T', '.', '.', '.', '.', '.'],
                 ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.']
             ]}
-        self.jps = JumpPointSearch(self.input_dict)
+        self.jps = JumpPointSearch(GridTools(self.input_dict))
 
     def test_correct_path_length_open(self):
         start = (0, 0)
