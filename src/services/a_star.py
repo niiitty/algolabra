@@ -1,14 +1,30 @@
+from enum import Enum
+from math import sqrt
+
+
+class Directions(Enum):
+    VERTICAL = (-1, 0), (1, 0)
+    HORIZONTAL = (0, -1), (0, 1)
+    DIAGONAL = (1, 1), (1, -1), (-1, 1), (-1, -1)
+
+
 class AStar:
     def __init__(self, grid):
         self.grid = grid        
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
+        path_length = 0
         while current in came_from.keys():
+            direction = self.grid.get_direction(current, came_from[current])
+            if direction in Directions.DIAGONAL.value:
+                path_length += sqrt(2)
+            else:
+                path_length += 1
             current = came_from[current]
             total_path.append(current)
 
-        return total_path[::-1]
+        return total_path[::-1], round(path_length, 8)
 
     def a_star_search(self, start: tuple, goal: tuple):
         came_from = {}

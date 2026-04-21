@@ -56,11 +56,11 @@ def index():
 
         if request.form.get("algorithm") == "A*":
             start_time = time.time()
-            path = AStar(map_data).a_star_search(start, goal)
+            path, path_length = AStar(map_data).a_star_search(start, goal)
             res_map = map_dict["grid"]
         else:
             start_time = time.time()
-            path, res_map = JumpPointSearch(
+            path, path_length, res_map = JumpPointSearch(
                 map_data).jump_point_search(start, goal)
 
         end_time = time.time()
@@ -77,6 +77,6 @@ def index():
                                path=path,
                                image=image,
                                time=total_time,
-                               length=len(path),
+                               length=path_length,
                                filled=filled
                                )

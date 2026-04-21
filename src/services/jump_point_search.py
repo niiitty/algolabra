@@ -1,4 +1,5 @@
 from enum import Enum
+from math import sqrt
 
 
 class Directions(Enum):
@@ -18,13 +19,14 @@ class JumpPointSearch:
             jump_points.append(current)
 
         total_path = []
+        path_length = 0
 
         for i in range(len(jump_points)):
             if jump_points[i] == current:
                 total_path.append((x, y))
                 self.grid.drawn_map[start[0]][start[1]] = "S"
                 self.grid.drawn_map[goal[0]][goal[1]] = "G"
-                return total_path[::-1]
+                return total_path[::-1], round(path_length, 8)
 
             direction = self.grid.get_direction(jump_points[i], jump_points[i + 1])
             x, y = jump_points[i]
@@ -32,6 +34,10 @@ class JumpPointSearch:
                 total_path.append((x, y))
                 x += direction[0]
                 y += direction[1]
+                if direction in Directions.DIAGONAL.value:
+                    path_length += sqrt(2)
+                else:
+                    path_length += 1
                 self.grid.drawn_map[x][y] = "/"
 
     def _prune(self, parent: tuple, current: tuple) -> list:
@@ -130,8 +136,8 @@ class JumpPointSearch:
         while jump_points:
             current = min(f_score, key=f_score.get)
             if current == goal:
-                path = self._reconstruct_path(came_from, current, start, goal)
-                return path, self.grid.drawn_map
+                path, path_length = self._reconstruct_path(came_from, current, start, goal)
+                return path, path_length, self.grid.drawn_map
 
             jump_points.remove(current)
             f_score.pop(current)
