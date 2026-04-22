@@ -37,6 +37,8 @@ class ScenarioTester:
         jps_correct = 0
         jps_incorrect = 0
 
+        tests_with_differing_lengths = 0
+
         file_dict = self.read(scen_file)
         grid = GridTools(MapReader(map_file).convert())
 
@@ -47,7 +49,7 @@ class ScenarioTester:
             start_y = scenario["start_y"]
             goal_x = scenario["goal_x"]
             goal_y = scenario["goal_y"]
-            optimal_length = scenario["optimal_length"]
+            optimal_length = round(scenario["optimal_length"], 6)
 
             start = (start_y, start_x)
             goal = (goal_y, goal_x)
@@ -67,8 +69,17 @@ class ScenarioTester:
             else:
                 jps_incorrect += 1
 
+            if a_star_path_length != jps_path_length:
+                tests_with_differing_lengths += 1
+
+        print("A* results:")
         print(f"Correct: {a_star_correct}, incorrect: {a_star_incorrect}")
+        print("JPS results:")
         print(f"Correct: {jps_correct}, incorrect: {jps_incorrect}")
+        if tests_with_differing_lengths == 0:
+            print("Both algorithms returned with equal path lengths in all tests.")
+        else:
+            print(f"Algorithms returned with differing path lenghts in {tests_with_differing_lengths} test(s).")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ class JumpPointSearch:
                 total_path.append((x, y))
                 self.grid.drawn_map[start[0]][start[1]] = "S"
                 self.grid.drawn_map[goal[0]][goal[1]] = "G"
-                return total_path[::-1], round(path_length, 8)
+                return total_path[::-1], round(path_length, 6)
 
             direction = self.grid.get_direction(jump_points[i], jump_points[i + 1])
             x, y = jump_points[i]

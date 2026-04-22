@@ -24,7 +24,7 @@ class AStar:
             current = came_from[current]
             total_path.append(current)
 
-        return total_path[::-1], round(path_length, 8)
+        return total_path[::-1], round(path_length, 6)
 
     def a_star_search(self, start: tuple, goal: tuple):
         came_from = {}
