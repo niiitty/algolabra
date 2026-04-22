@@ -23,6 +23,7 @@ class JumpPointSearch:
 
         for i in range(len(jump_points)):
             if jump_points[i] == current:
+                x, y = jump_points[i]
                 total_path.append((x, y))
                 self.grid.drawn_map[start[0]][start[1]] = "S"
                 self.grid.drawn_map[goal[0]][goal[1]] = "G"

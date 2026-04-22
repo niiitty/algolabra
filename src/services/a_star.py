@@ -55,4 +55,4 @@ class AStar:
                     f_score[neighbour] = tentative_g_score + \
                         self.grid.cost_estimate(neighbour, goal)
 
-        return False
+        return False, round(0)
