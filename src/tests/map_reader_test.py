@@ -5,7 +5,7 @@ from src.services.map_reader import MapReader
 class TestMapReader(unittest.TestCase):
     def setUp(self):
         self.reader = MapReader()
-        self.reader.read("src/tests/maps/wall.map")
+        self.reader.read("src/tests/maps/.map")
         self.converted = self.reader.convert()
 
     def test_return_correct_height(self):
