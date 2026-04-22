@@ -14,6 +14,8 @@
 
 [Viikko 5](docs/viikkoraportit/viikko-5.md)
 
+[Viikko 6](docs/viikkoraportit/viikko-6.md)
+
 
 ## Käyttöohje
 
@@ -27,4 +29,4 @@ Tämän jälkeen sovellus voidaan käynnistää komennolla
 poetry run python src/index.py
 ```
 
-Sovellukseen syötetään map-tiedosto, joita löytyy esimerkiksi `src/tests/maps` tai https://www.movingai.com/benchmarks/grids.html. Lisäksi sovellus ottaa lähtö- ja maalipisteiden koordinaatit muodossa (x, y). Sovellus palauttaa käytetyn ajan sekä lyhyimmän reitin, minkä sen myös piirtää.
+Sovellukseen syötetään map-tiedosto, joita löytyy kansiosta `src/tests/maps`. Nämä ovat otettu Nathan Sturtenvartin [Moving AI Lab](https://www.movingai.com/benchmarks/grids.html) -sivuilta. Sieltä löytyy lisää karttoja, joita voi käyttää. Lisäksi sovellus ottaa lähtö- ja maalipisteiden koordinaatit muodossa (x, y). Sovellus palauttaa käytetyn ajan sekä lyhyimmän reitin, minkä sen myös piirtää.
