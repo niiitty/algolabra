@@ -1,6 +1,7 @@
 from enum import Enum
 from math import sqrt
 
+from services.grid_tools import GridTools
 
 class Directions(Enum):
     VERTICAL = (-1, 0), (1, 0)
@@ -10,7 +11,7 @@ class Directions(Enum):
 
 class AStar:
     def __init__(self, grid):
-        self.grid = grid        
+        self.grid = GridTools(grid)        
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]

@@ -1,6 +1,7 @@
 from enum import Enum
 from math import sqrt
 
+from services.grid_tools import GridTools
 
 class Directions(Enum):
     VERTICAL = (-1, 0), (1, 0)
@@ -10,7 +11,7 @@ class Directions(Enum):
 
 class JumpPointSearch:
     def __init__(self, grid):
-        self.grid = grid
+        self.grid = GridTools(grid)
 
     def _reconstruct_path(self, came_from: dict, current, start, goal) -> list:
         jump_points = [current]
@@ -21,7 +22,7 @@ class JumpPointSearch:
         total_path = []
         path_length = 0
 
-        for i in range(len(jump_points)):
+        for i, jump_point in enumerate(jump_points):
             if jump_points[i] == current:
                 x, y = jump_points[i]
                 total_path.append((x, y))

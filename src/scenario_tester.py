@@ -5,7 +5,7 @@ from os.path import basename
 from services.map_reader import MapReader
 from services.a_star import AStar
 from services.jump_point_search import JumpPointSearch
-from utils.grid_tools import GridTools
+from services.grid_tools import GridTools
 
 
 class ScenarioTester:
