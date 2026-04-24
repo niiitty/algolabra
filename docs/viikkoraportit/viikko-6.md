@@ -1,14 +1,15 @@
 ## Viikko 6
 
-1. 
-2. 
+1. Tein luokan, jolla pystyy käymään läpi scen-tiedostoa ja vertailemaan sen tuloksia algoritmien tuloksiin.
+2. Algoritmien sääntöjä on muutettu siten, että vinoliikettä ei sallita, jos molempien naapuripääsuuntien kautta ei pääsisi kulkemaan siihen.
 3. 
-4. .scen-tiedostojen optimaalipituudet ovat välillä pidemmät kuin oman algoritmin.
+4. 
 5. 
 
 | Viikonpäivä | Tuntia käytetty |
 | --------    | -------         |
 | Maanantai   | 3               |
 | Tiistai     | 4               |
-| Keskiviikko | 1               |
-| Yhteensä    | 7               |
+| Keskiviikko | 4               |
+| Perjantai   | 3               |
+| Yhteensä    | 14              |

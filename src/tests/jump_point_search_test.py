@@ -32,7 +32,7 @@ class TestJumpPointSearch(unittest.TestCase):
         start = (8, 0)
         goal = (7, 7)
         path = self.jps.jump_point_search(start, goal)[0]
-        self.assertEqual(len(path), 8)
+        self.assertEqual(len(path), 9)
 
     def test_no_path_found(self):
         start = (5, 4)

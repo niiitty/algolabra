@@ -13,22 +13,33 @@ class GridTools:
         return (abs(xg - xn) + abs(yg - yn)) + \
             (1.414 - 2) * min(abs(xg - xn), abs(yg - yn))
 
-    def neighbours(self, node):
+    def get_neighbours(self, node):
         "Palauttaa kaikki naapurit, joihin voi siirtyä."
         x, y = node
-        directions = [
-            (-1, 0), (1, 0),
-            (0, -1), (0, 1),
-            (-1, 1), (1, -1),
-            (1, 1), (-1, -1)
+
+        cardinal_directions = [
+            (0, -1), (1, 0),
+            (0, 1), (-1, 0)
+        ]
+
+        diagonal_directions = [
+            (-1, -1), (1, -1),
+            (-1, 1), (1, 1)
         ]
 
         neighbours = []
 
-        for dir_x, dir_y in directions:
-            nx, ny = x + dir_x, y + dir_y
+        for dx, dy in cardinal_directions:
+            nx, ny = x + dx, y + dy
             if not self.is_blocked(nx, ny):
                 neighbours.append((nx, ny))
+
+        for dx, dy in diagonal_directions:
+            nx, ny = x + dx, y + dy
+            if (nx, y) in neighbours and (x, ny) in neighbours:
+                if not self.is_blocked(nx, ny):
+                    neighbours.append((nx, ny))
+
         return neighbours
 
     def in_bounds(self, x, y) -> bool:

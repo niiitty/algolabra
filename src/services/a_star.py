@@ -11,7 +11,7 @@ class Directions(Enum):
 
 class AStar:
     def __init__(self, grid):
-        self.grid = GridTools(grid)        
+        self.grid = GridTools(grid)
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
@@ -25,7 +25,7 @@ class AStar:
             current = came_from[current]
             total_path.append(current)
 
-        return total_path[::-1], round(path_length, 6)
+        return total_path[::-1], path_length
 
     def a_star_search(self, start: tuple, goal: tuple):
         came_from = {}
@@ -40,7 +40,7 @@ class AStar:
 
             f_score.pop(current)
 
-            neighbouring_nodes = self.grid.neighbours(current)
+            neighbouring_nodes = self.grid.get_neighbours(current)
 
             for neighbour in neighbouring_nodes:
                 if neighbour not in g_score:
@@ -56,4 +56,4 @@ class AStar:
                     f_score[neighbour] = tentative_g_score + \
                         self.grid.cost_estimate(neighbour, goal)
 
-        return False, round(0)
+        return False, 0

@@ -13,9 +13,9 @@ Yksikkötestit voidaan ajaa projektin juurihakemistosta komennolla
 poetry run python -m pytest
 ```
 
-scen-tiedostoilla testaaminen tapahtuu erillisellä scenario reader -ohjelmalla, joka ajetaa komennolla
+scen-tiedostoilla testaaminen tapahtuu erillisellä scenario tester -ohjelmalla, joka ajetaa komennolla
 ```
-poetry run python src/scenario_reader.py
+poetry run python src/scenario_tester.py
 ```
 Ohjelma ensin luettelee `src/tests/maps/`-polussa sijaitsevat map-tiedostot. Valmiiksi lisätyillä kartoilla on vastaava scen-tiedosto myös kansiossa. Kun käyttäjä on valinnut kartan, kaikki sen skenaariot käydään läpi. Ohjelma vertaa molemmilla algoritmeilla saadun polun pituutta odotettuun optimipituuteen ja tarkistaa, että algoritmien tuottamat pituudet ovat yhtä suuret.
 

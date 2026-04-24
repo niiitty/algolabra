@@ -3,6 +3,7 @@ from math import sqrt
 
 from services.grid_tools import GridTools
 
+
 class Directions(Enum):
     VERTICAL = (-1, 0), (1, 0)
     HORIZONTAL = (0, -1), (0, 1)
@@ -28,9 +29,10 @@ class JumpPointSearch:
                 total_path.append((x, y))
                 self.grid.drawn_map[start[0]][start[1]] = "S"
                 self.grid.drawn_map[goal[0]][goal[1]] = "G"
-                return total_path[::-1], round(path_length, 6)
+                return total_path[::-1], path_length
 
-            direction = self.grid.get_direction(jump_points[i], jump_points[i + 1])
+            direction = self.grid.get_direction(
+                jump_points[i], jump_points[i + 1])
             x, y = jump_points[i]
             while (x, y) != jump_points[i + 1]:
                 total_path.append((x, y))
@@ -44,32 +46,14 @@ class JumpPointSearch:
 
     def _prune(self, parent: tuple, current: tuple) -> list:
         if not parent or parent == current:
-            return self.grid.neighbours(current)
+            return self.grid.get_neighbours(current)
 
         cx, cy = current
         dx, dy = self.grid.get_direction(parent, current)
 
         pruned_neighbours = []
 
-        if dx != 0 and dy == 0:  # pysty
-            pruned_neighbours.append((cx + dx, cy))
-            if self.grid.is_blocked(
-                    cx, cy + 1) and not self.grid.is_blocked(cx + dx, cy + 1):
-                pruned_neighbours.append((cx + dx, cy + 1))
-            if self.grid.is_blocked(
-                    cx, cy - 1) and not self.grid.is_blocked(cx + dx, cy - 1):
-                pruned_neighbours.append((cx + dx, cy - 1))
-
-        elif dx == 0 and dy != 0:  # vaaka
-            pruned_neighbours.append((cx, cy + dy))
-            if self.grid.is_blocked(
-                    cx + 1, cy) and not self.grid.is_blocked(cx + 1, cy + dy):
-                pruned_neighbours.append((cx + 1, cy + dy))
-            if self.grid.is_blocked(
-                    cx - 1, cy) and not self.grid.is_blocked(cx - 1, cy + dy):
-                pruned_neighbours.append((cx - 1, cy + dy))
-
-        elif dx != 0 and dy != 0:  # vino
+        if dx != 0 and dy != 0:  # vino
             pruned_neighbours.append((cx + dx, cy + dy))
             pruned_neighbours.append((cx + dx, cy))
             pruned_neighbours.append((cx, cy + dy))
@@ -80,8 +64,9 @@ class JumpPointSearch:
             if self.grid.is_blocked(
                     cx, cy - dy) and not self.grid.is_blocked(cx + dx, cy - dy):
                 pruned_neighbours.append((cx + dx, cy - dy))
+            return pruned_neighbours
 
-        return pruned_neighbours
+        return self.grid.get_neighbours(current) # pysty ja vaaka
 
 # -+ 0+ ++
 # -0 00 +0
@@ -91,26 +76,27 @@ class JumpPointSearch:
         x, y = node
         if direction in Directions.VERTICAL.value:
             dx = direction[0]
-            if (self.grid.is_blocked(x, y + 1) and not self.grid.is_blocked(x + dx, y + 1)
-                ) or (self.grid.is_blocked(x, y - 1) and not self.grid.is_blocked(x + dx, y - 1)):
+            if (self.grid.is_blocked(x - dx, y - 1) and not self.grid.is_blocked(x, y - 1)
+                ) or (self.grid.is_blocked(x - dx, y + 1) and not self.grid.is_blocked(x, y + 1)):
                 return True
         elif direction in Directions.HORIZONTAL.value:
             dy = direction[1]
-            if (self.grid.is_blocked(x + 1, y) and not self.grid.is_blocked(x + 1, y + dy)
-                ) or (self.grid.is_blocked(x - 1, y) and not self.grid.is_blocked(x - 1, y + dy)):
+            if (self.grid.is_blocked(x - 1, y - dy) and not self.grid.is_blocked(x - 1, y)
+                ) or (self.grid.is_blocked(x + 1, y - dy) and not self.grid.is_blocked(x + 1, y)):
                 return True
         elif direction in Directions.DIAGONAL.value:
             dx, dy = direction
             if (self.grid.is_blocked(x - dx, y) and not self.grid.is_blocked(x - dx, y + dy)
-                ) or (self.grid.is_blocked(x, y - dy) and not self.grid.is_blocked(x + dx, y - dy)):
+                    ) or (self.grid.is_blocked(x, y - dy) and not self.grid.is_blocked(x + dx, y - dy)):
                 return True
 
         return False
 
-    def _jump(self, node: tuple, direction: tuple, start: tuple, goal: tuple) -> tuple | None:
+    def _jump(self, node: tuple, direction: tuple,
+              start: tuple, goal: tuple) -> tuple | None:
         "Rekursiivisesti etsii hyppypisteitä."
         n = node[0] + direction[0], node[1] + direction[1]
-        if n not in self.grid.neighbours(node):
+        if n not in self.grid.get_neighbours(node):
             return None
         if n == goal:
             self.grid.drawn_map[n[0]][n[1]] = "x"
@@ -138,7 +124,8 @@ class JumpPointSearch:
         while jump_points:
             current = min(f_score, key=f_score.get)
             if current == goal:
-                path, path_length = self._reconstruct_path(came_from, current, start, goal)
+                path, path_length = self._reconstruct_path(
+                    came_from, current, start, goal)
                 return path, path_length, self.grid.drawn_map
 
             jump_points.remove(current)
@@ -163,4 +150,4 @@ class JumpPointSearch:
                         f_score[found] = tentative_g_score + \
                             self.grid.cost_estimate(found, goal)
 
-        return None, self.grid.drawn_map
+        return None, 0, self.grid.drawn_map
