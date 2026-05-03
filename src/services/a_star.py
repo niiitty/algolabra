@@ -17,6 +17,7 @@ class AStar:
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
+        self.grid.drawn_map[current[0]][current[1]] = "G"
         path_length = 0
         while current in came_from.keys():
             direction = self.grid.get_direction(current, came_from[current])
@@ -24,9 +25,11 @@ class AStar:
                 path_length += sqrt(2)
             else:
                 path_length += 1
+            self.grid.drawn_map[current[0]][current[1]] = "/"
             current = came_from[current]
             total_path.append(current)
 
+        self.grid.drawn_map[current[0]][current[1]] = "S"
         return total_path[::-1], path_length
 
     def a_star_search(self, start: tuple, goal: tuple):

@@ -9,25 +9,6 @@ from services.jump_point_search import JumpPointSearch
 
 app = Flask(__name__)
 
-
-def draw_path(grid, path, start, goal):
-    for move in path:
-        x, y = move
-        grid[x][y] = "/"
-
-    sx, sy = start
-    grid[sx][sy] = "S"
-
-    gx, gy = goal
-    grid[gx][gy] = "G"
-
-    res = []
-    for row in grid:
-        res.append("".join(row))
-
-    return res
-
-
 @app.route("/", methods=["POST", "GET"])
 def index():
     if request.method == "GET":
