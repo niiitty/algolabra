@@ -1,3 +1,5 @@
+import heapq
+
 from enum import Enum
 from math import sqrt
 
@@ -24,7 +26,7 @@ class JumpPointSearch:
         path_length = 0
 
         for i, jump_point in enumerate(jump_points):
-            if jump_points[i] == current:
+            if jump_point == current:
                 x, y = jump_points[i]
                 total_path.append((x, y))
                 self.grid.drawn_map[start[0]][start[1]] = "S"
@@ -53,7 +55,31 @@ class JumpPointSearch:
 
         pruned_neighbours = []
 
-        if dx != 0 and dy != 0:  # vino
+        if dx == 0 and dy != 0:  # pysty
+            for i in [-1, 0, 1]:
+                if not self.grid.is_blocked(cx + i, cy + dy):
+                    pruned_neighbours.append((cx + i, cy + dy))
+    
+            if self.grid.is_blocked(
+                    cx + 1, cy - dy) and not self.grid.is_blocked(cx + 1, cy):
+                pruned_neighbours.append((cx + 1, cy))
+            if self.grid.is_blocked(
+                    cx - 1, cy - dy) and not self.grid.is_blocked(cx - 1, cy):
+                pruned_neighbours.append((cx - 1, cy))
+
+        elif dx != 0 and dy == 0:  # vaaka
+            for i in [-1, 0, 1]:
+                if not self.grid.is_blocked(cx + dx, cy + i):
+                    pruned_neighbours.append((cx + dx, cy + i))
+
+            if self.grid.is_blocked(
+                    cx - dx, cy + 1) and not self.grid.is_blocked(cx, cy + 1):
+                pruned_neighbours.append((cx, cy + 1))
+            if self.grid.is_blocked(
+                    cx - dx, cy - 1) and not self.grid.is_blocked(cx, cy - 1):
+                pruned_neighbours.append((cx, cy - 1))
+
+        elif dx != 0 and dy != 0:  # vino
             pruned_neighbours.append((cx + dx, cy + dy))
             pruned_neighbours.append((cx + dx, cy))
             pruned_neighbours.append((cx, cy + dy))
@@ -64,9 +90,8 @@ class JumpPointSearch:
             if self.grid.is_blocked(
                     cx, cy - dy) and not self.grid.is_blocked(cx + dx, cy - dy):
                 pruned_neighbours.append((cx + dx, cy - dy))
-            return pruned_neighbours
 
-        return self.grid.get_neighbours(current) # pysty ja vaaka
+        return pruned_neighbours
 
 # -+ 0+ ++
 # -0 00 +0
@@ -96,8 +121,11 @@ class JumpPointSearch:
               start: tuple, goal: tuple) -> tuple | None:
         "Rekursiivisesti etsii hyppypisteitä."
         n = node[0] + direction[0], node[1] + direction[1]
-        if n not in self.grid.get_neighbours(node):
+        if self.grid.is_blocked(n[0], n[1]):
             return None
+        if direction in Directions.DIAGONAL.value:
+            if self.grid.is_blocked(node[0] + direction[0], node[1]) or self.grid.is_blocked(node[0], node[1] + direction[1]):
+                return None
         if n == goal:
             self.grid.drawn_map[n[0]][n[1]] = "x"
             return n
@@ -118,24 +146,26 @@ class JumpPointSearch:
         came_from = {start: None}
         g_score = {start: 0}
         f_score = {start: self.grid.cost_estimate(start, goal)}
-        jump_points = set()
-        jump_points.add(start)
+        jump_points = []
+        heapq.heappush(jump_points, (f_score[start], start))
+
+        visited = set()
 
         while jump_points:
-            current = min(f_score, key=f_score.get)
+            current = heapq.heappop(jump_points)[1]
+            if current in visited:
+                continue
             if current == goal:
                 path, path_length = self._reconstruct_path(
                     came_from, current, start, goal)
                 return path, path_length, self.grid.drawn_map
 
-            jump_points.remove(current)
-            f_score.pop(current)
+            visited.add(current)
 
             for node in self._prune(came_from[current], current):
                 direction = self.grid.get_direction(current, node)
                 found = self._jump(current, direction, start, goal)
                 if found:
-                    jump_points.add(found)
                     if found not in g_score:
                         g_score[found] = float("inf")
                     if found not in f_score:
@@ -149,5 +179,7 @@ class JumpPointSearch:
                         g_score[found] = tentative_g_score
                         f_score[found] = tentative_g_score + \
                             self.grid.cost_estimate(found, goal)
+                        if found not in jump_points:
+                            heapq.heappush(jump_points, (f_score[found], found))
 
-        return None, 0, self.grid.drawn_map
+        return [], 0, self.grid.drawn_map
