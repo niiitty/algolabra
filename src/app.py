@@ -33,22 +33,17 @@ def index():
             return render_template("index.html", error=error, filled=filled)
 
         if request.form.get("algorithm") == "A*":
-            start_time = time.time()
-            path, path_length = AStar(map_dict).a_star_search(start, goal)
-            res_map = map_dict["grid"]
+            start_time = time.perf_counter()
+            path, path_length, resulting_map = AStar(map_dict).a_star_search(start, goal)
         else:
-            start_time = time.time()
-            path, path_length, res_map = JumpPointSearch(
+            start_time = time.perf_counter()
+            path, path_length, resulting_map = JumpPointSearch(
                 map_dict).jump_point_search(start, goal)
 
-        end_time = time.time()
+        end_time = time.perf_counter()
         total_time = end_time - start_time
 
-        if path:
-            image = draw_path(res_map, path, start, goal)
-        else:
-            image = ["".join(row) for row in res_map]
-            path = []
+        image = ["".join(row) for row in resulting_map]
 
         return render_template("index.html",
                                error=error,
