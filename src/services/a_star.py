@@ -25,8 +25,8 @@ class AStar:
                 path_length += sqrt(2)
             else:
                 path_length += 1
-            self.grid.drawn_map[current[0]][current[1]] = "/"
             current = came_from[current]
+            self.grid.drawn_map[current[0]][current[1]] = "/"
             total_path.append(current)
 
         self.grid.drawn_map[current[0]][current[1]] = "S"
