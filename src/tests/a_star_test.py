@@ -38,4 +38,4 @@ class TestAStar(unittest.TestCase):
         start = (5, 4)
         goal = (4, 7)
         path = self.a_star.a_star_search(start, goal)[0]
-        self.assertEqual(path, False)
+        self.assertEqual(path, [])

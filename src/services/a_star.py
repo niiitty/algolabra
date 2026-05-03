@@ -1,3 +1,5 @@
+import heapq
+
 from enum import Enum
 from math import sqrt
 
@@ -29,17 +31,22 @@ class AStar:
 
     def a_star_search(self, start: tuple, goal: tuple):
         came_from = {}
+        open_set = []
         g_score = {start: 0}
         f_score = {start: self.grid.cost_estimate(start, goal)}
 
-        while f_score:
-            current = min(f_score, key=f_score.get)
+        heapq.heappush(open_set, (f_score[start], start))
+
+        visited = set()
+        while open_set:
+            current = heapq.heappop(open_set)[1] # valitaan pelkkä node
+            if current in visited:
+                continue
             if current == goal:
-                path = self._reconstruct_path(came_from, current)
-                return path
-
-            f_score.pop(current)
-
+                path, path_length = self._reconstruct_path(came_from, current)
+                return path, path_length, self.grid.drawn_map
+            visited.add(current)
+            self.grid.drawn_map[current[0]][current[1]] = ":"
             neighbouring_nodes = self.grid.get_neighbours(current)
 
             for neighbour in neighbouring_nodes:
@@ -55,5 +62,7 @@ class AStar:
                     g_score[neighbour] = tentative_g_score
                     f_score[neighbour] = tentative_g_score + \
                         self.grid.cost_estimate(neighbour, goal)
+                    if neighbour not in open_set:
+                        heapq.heappush(open_set, (f_score[neighbour], neighbour))
 
-        return False, 0
+        return [], 0, self.grid.drawn_map
