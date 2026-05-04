@@ -7,10 +7,12 @@
   <body>
 
     {% if error %}
-      <p><strong>Virhe:</strong> {{ error }}</p>
+      <p><strong>Virhe: {{ error }}</strong></p>
     {% endif %}
 
+    {% if time %}
     Käytetty aika: {{ time }} <br />
+    {% endif %}
     {% if path %}
       Reitin pituus: {{ length }}
       <h3>Reitti</h3>
@@ -26,7 +28,8 @@
           id ="map-file"
           name="map-file"
           accept=".map"
-          required />
+          required
+        />
 
         <input type="number" id="start-x" name="start-x" value="{{ filled.sx }}" placeholder="Lähtö X" required />
         <input type="number" id="start-y" name="start-y" value="{{ filled.sy }}" placeholder="Lähtö Y" required />
@@ -43,10 +46,13 @@
     </div>
 
     {% if image %}
+    <br />
+    Hiirellä pääsee näkemään koordinaatit.
     <pre>
-      {% for row in image %}{{ row }}
+      {% for row in image %}{% for node in row %}<span title="x={{ node.x }}, y={{ node.y }}">{{ node.char }}</span>{% endfor %}
       {% endfor %}
     </pre>
     {% endif %}
+
   </body>
 </html>

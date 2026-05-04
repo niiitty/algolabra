@@ -22,15 +22,13 @@ def index():
         start = (sy, sx)
         goal = (gy, gx)
 
-        reader = MapReader(map_file)
-        map_dict = reader.convert()
+        map_dict = MapReader(map_file).convert()
 
         error = None
         filled = {"sx": sx, "sy": sy, "gx": gx, "gy": gy}
 
         if map_dict["grid"][sy][sx] != "." or map_dict["grid"][gy][gx] != ".":
             error = "Joko lähtö- tai maalipiste ei ole kuljettavissa."
-            return render_template("index.html", error=error, filled=filled)
 
         if request.form.get("algorithm") == "A*":
             start_time = time.perf_counter()
@@ -43,7 +41,13 @@ def index():
         end_time = time.perf_counter()
         total_time = end_time - start_time
 
-        image = ["".join(row) for row in resulting_map]
+
+        image = []
+        for y, row in enumerate(resulting_map):
+            rows = []
+            for x, node in enumerate(row):
+                rows.append({"char": node, "x": x, "y": y})
+            image.append(rows)
 
         return render_template("index.html",
                                error=error,
