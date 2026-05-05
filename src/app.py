@@ -9,6 +9,8 @@ from services.jump_point_search import JumpPointSearch
 
 app = Flask(__name__)
 
+saved_map_dict = {}
+
 @app.route("/", methods=["POST", "GET"])
 def index():
     if request.method == "GET":
@@ -22,10 +24,18 @@ def index():
         start = (sy, sx)
         goal = (gy, gx)
 
-        map_dict = MapReader(map_file).convert()
-
         error = None
         filled = {"sx": sx, "sy": sy, "gx": gx, "gy": gy}
+
+        if map_file:
+            map_dict = MapReader(map_file).convert()
+            global saved_map_dict
+            saved_map_dict = map_dict
+        elif len(saved_map_dict) != 0:
+            map_dict = saved_map_dict
+        else:
+            error = "Syötä map-tiedosto."
+            return render_template("index.html", filled=filled, error=error)
 
         if map_dict["grid"][sy][sx] != "." or map_dict["grid"][gy][gx] != ".":
             error = "Joko lähtö- tai maalipiste ei ole kuljettavissa."
