@@ -24,7 +24,7 @@ class ScenarioTester:
         for i, row in enumerate(lines[1:]):
             parts = row.strip().split()
 
-            if 300 > float(parts[8]) > 200:
+            if 275 > float(parts[8]) > 215:
                 file_dict[i] = {
                     "start_x": int(parts[4]),
                     "start_y": int(parts[5]),
@@ -53,6 +53,9 @@ class ScenarioTester:
         a_star_time = 0
         jps_time = 0
 
+        a_star_faster = 0
+        jps_faster = 0
+
         file_dict = self.read(scen_file)
         grid = MapReader(map_file).convert()
 
@@ -71,7 +74,7 @@ class ScenarioTester:
             start_time = time.perf_counter()
             a_star_path_length = AStar(grid).a_star_search(start, goal)[1]
             end_time = time.perf_counter()
-            a_star_time += end_time - start_time
+            a_star_time += (end_time - start_time)
 
             if math.isclose(a_star_path_length, optimal_length, rel_tol=1e-6):
                 a_star_correct += 1
@@ -82,7 +85,7 @@ class ScenarioTester:
             jps_path_length = JumpPointSearch(
                 grid).jump_point_search(start, goal)[1]
             end_time = time.perf_counter()
-            jps_time += end_time - start_time
+            jps_time += (end_time - start_time)
 
             if math.isclose(jps_path_length, optimal_length, rel_tol=1e-6):
                 jps_correct += 1
@@ -94,6 +97,11 @@ class ScenarioTester:
                 tests_with_differing_lengths += 1
                 print(a_star_path_length)
                 print(jps_path_length)
+            
+            if a_star_time < jps_time:
+                a_star_faster += 1
+            else:
+                jps_faster += 1
 
         a_star_average_time = a_star_time / len(file_dict)
         jps_average_time = jps_time / len(file_dict)
@@ -109,6 +117,7 @@ class ScenarioTester:
         else:
             print(
                 f"Algorithms returned with differing path lenghts in {tests_with_differing_lengths} test(s).")
+        print(f"A* was faster {a_star_faster} time(s) and JPS {jps_faster} time(s).")
 
 
 if __name__ == "__main__":
