@@ -21,8 +21,8 @@ class ScenarioTester:
         except BaseException as exc:
             raise FileNotFoundError from exc
 
+        print("Taking 100 longest tests.")
         for i, row in enumerate(lines[::-1][:100]):
-            print(row)
             parts = row.strip().split()
 
             file_dict[i] = {
