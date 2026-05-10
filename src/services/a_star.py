@@ -17,7 +17,16 @@ class AStar:
         self.grid = GridTools(grid)
         self.result = namedtuple("result", ["path", "length", "map"])
 
-    def _reconstruct_path(self, came_from: dict, current):
+    def _reconstruct_path(self, came_from: dict, current: tuple) -> tuple[list, float]:
+        """Rakennetaan lyhin polku. Lasketaan samalla reitin pituus. Huom. pysty- ja vaakaliikkeiden pituus on 1, kun taas vinoliikkeillä se on sqrt(2).
+
+        Args:
+            came_from (dict): Sanakirja, jossa solmu-avaimen arvo on seuraava solmun niin, että se johtaa alkupisteeseen lyhimmällä reitillä.
+            current (tuple): Solmu, josta aloitetaan polun rakentaminen.
+
+        Returns:
+            tuple[list, float]: Lyhin reitti lähtöpisteestä maalin sekä reitin pituus.
+        """
         total_path = [current]
         self.grid.drawn_map[current[0]][current[1]] = "G"
         path_length = 0
@@ -34,7 +43,17 @@ class AStar:
         self.grid.drawn_map[current[0]][current[1]] = "S"
         return total_path[::-1], path_length
 
-    def a_star_search(self, start: tuple, goal: tuple):
+    def a_star_search(self, start: tuple, goal: tuple) -> namedtuple:
+        """Etsii lyhimmän reitin kahden pisteen välillä A*-algoritmilla.
+
+        Args:
+            start (tuple): Lähtöpiste
+            goal (tuple): Maalipiste
+        Pisteet muodossa (x, y)
+        Returns:
+            namedtuple: Nimetty tuple, jossa on polku (path), pituus (length) ja piirretty kartta (map). Pääsee käsiksi esim. result.path
+            Jos reittiä ei löydetty, path on tyhjä lista ja length on 0.
+        """
         came_from = {}
         open_set = []
         g_score = {start: 0}

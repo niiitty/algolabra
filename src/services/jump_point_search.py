@@ -18,7 +18,18 @@ class JumpPointSearch:
         self.grid = GridTools(grid)
         self.result = namedtuple("result", ["path", "length", "map"])
 
-    def _reconstruct_path(self, came_from: dict, current, start, goal) -> list:
+    def _reconstruct_path(self, came_from: dict, current: tuple, start: tuple, goal: tuple) -> tuple[list, float]:
+        """Rakennetaan lyhin polku. Lasketaan samalla reitin pituus. Huom. pysty- ja vaakaliikkeiden pituus on 1, kun taas vinoliikkeillä se on sqrt(2).
+
+        Args:
+            came_from (dict): Sanakirja, jossa solmu-avaimen arvo on seuraava hyppypiste niin, että niiden kautta kulkee lyhin reitti.
+            current (tuple): Solmu, josta aloitetaan polun rakentaminen.
+            start (tuple): Lähtöpiste
+            goal (tuple): Maalipiste
+
+        Returns:
+            tuple[list, float]: Lyhin reitti lähtöpisteestä maalin sekä reitin pituus.
+        """
         jump_points = [current]
         while came_from.get(current) is not None:
             current = came_from[current]
@@ -49,6 +60,15 @@ class JumpPointSearch:
                 self.grid.drawn_map[x][y] = "/"
 
     def _prune(self, parent: tuple, current: tuple) -> list:
+        """Palauttaa karsitun naapurilistan JPS:n sääntöjen mukaisesti: Salli eteenpäin suuntautuvat naapurit ja lisää pakotetut naapurit.
+
+        Args:
+            parent (tuple): Edeltävä solmu
+            current (tuple): Nykyinen solmu
+
+        Returns:
+            list: Karsittu lista naapureita, joihin voi liikkua nykysolmusta.
+        """
         if not parent or parent == current:
             return self.grid.get_neighbours(current)
 
@@ -95,11 +115,16 @@ class JumpPointSearch:
 
         return pruned_neighbours
 
-# -+ 0+ ++
-# -0 00 +0
-# -- 0- +-
+    def _has_forced_neighbour(self, node: tuple, direction) -> bool:
+        """Tarkistaa, onko solmulla pakotettu naapuri annetussa suunnassa. Esteen takia kaikkia luonnollisia naapureita ei voida välttämättä karsia, jolloin se on pakotettu naapuri.
 
-    def _has_forced_neighbour(self, node: tuple, direction):
+        Args:
+            node (tuple): Tarkasteltava solmu
+            direction (_type_): Liikesuunta normalisoituna
+
+        Returns:
+            bool: True, jos annetulla solmulla on pakotettu naapuri. Muuten False.
+        """
         x, y = node
         if direction in Directions.VERTICAL.value:
             dx = direction[0]
@@ -119,9 +144,21 @@ class JumpPointSearch:
 
         return False
 
-    def _jump(self, node: tuple, direction: tuple,
-              start: tuple, goal: tuple) -> tuple | None:
-        "Rekursiivisesti etsii hyppypisteitä."
+    def _jump(self, node: tuple, direction: tuple, goal: tuple) -> tuple | None:
+        """Rekursiivisesti etsii hyppypisteen annetusta solmusta ja suunnasta. Palauttaa hyppypisteen, jos:
+            - seuraava solmu on maali
+            - seuraavalla solmulla on pakotettu naapuri
+            - vinoliikkeellä jommankumman pääilmasuunnan haut löytävät hyppypisteen
+
+        Args:
+            node (tuple): Solmu, josta hyppy aloitetaan
+            direction (tuple): Hyppäämisen suunta
+            start (tuple): Lähtöpiste
+            goal (tuple): Maalipiste
+
+        Returns:
+            tuple | None: Palauttaa hyppypisteen, jos sellainen löytyy.
+        """
         n = node[0] + direction[0], node[1] + direction[1]
         if self.grid.is_blocked(n[0], n[1]):
             return None
@@ -138,13 +175,23 @@ class JumpPointSearch:
             # ne kaksi suuntaa johon mennään vinosuunnassa, huom tuplen arvot
             # kertovat nämä
             for d_i in ((direction[0], 0), (0, direction[1])):
-                if self._jump(n, d_i, start, goal):
+                if self._jump(n, d_i, goal):
                     self.grid.drawn_map[n[0]][n[1]] = "x"
                     return n
         self.grid.drawn_map[n[0]][n[1]] = ":"
-        return self._jump(n, direction, start, goal)
+        return self._jump(n, direction, goal)
 
-    def jump_point_search(self, start: tuple, goal: tuple):
+    def jump_point_search(self, start: tuple, goal: tuple) -> namedtuple:
+        """Etsii lyhimmän reitin kahden pisteen välillä Jump point search -algoritmilla.
+
+        Args:
+            start (tuple): Lähtöpiste
+            goal (tuple): Maalipiste
+        Pisteet muodossa (x, y)
+        Returns:
+            namedtuple: Nimetty tuple, jossa on polku (path), pituus (length) ja piirretty kartta (map). Pääsee käsiksi esim. result.path
+            Jos reittiä ei löydetty, path on tyhjä lista ja length on 0.
+        """
         came_from = {start: None}
         g_score = {start: 0}
         f_score = {start: self.grid.cost_estimate(start, goal)}
@@ -166,7 +213,7 @@ class JumpPointSearch:
 
             for node in self._prune(came_from[current], current):
                 direction = self.grid.get_direction(current, node)
-                found = self._jump(current, direction, start, goal)
+                found = self._jump(current, direction, goal)
                 if found:
                     if found not in g_score:
                         g_score[found] = float("inf")
