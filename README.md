@@ -3,6 +3,10 @@
 ## Dokumentaatio
 [Määrittelydokumentti](docs/maarittelydokumentti.md)
 
+[Toteutusdokumentti](docs/toteutusdokumentti.md)
+
+[Testausdokumentti](docs/testausdokumentti.md)
+
 ## Viikkoraportit
 [Viikko 1](docs/viikkoraportit/viikko-1.md)
 
