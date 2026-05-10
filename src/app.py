@@ -42,18 +42,17 @@ def index():
 
         if request.form.get("algorithm") == "A*":
             start_time = time.perf_counter()
-            path, path_length, resulting_map = AStar(map_dict).a_star_search(start, goal)
+            result = AStar(map_dict).a_star_search(start, goal)
         else:
             start_time = time.perf_counter()
-            path, path_length, resulting_map = JumpPointSearch(
-                map_dict).jump_point_search(start, goal)
+            result = JumpPointSearch(map_dict).jump_point_search(start, goal)
 
         end_time = time.perf_counter()
         total_time = end_time - start_time
 
 
         image = []
-        for y, row in enumerate(resulting_map):
+        for y, row in enumerate(result.map):
             rows = []
             for x, node in enumerate(row):
                 rows.append({"char": node, "x": x, "y": y})
@@ -61,9 +60,9 @@ def index():
 
         return render_template("index.html",
                                error=error,
-                               path=path,
+                               path=result.path,
                                image=image,
                                time=total_time,
-                               length=path_length,
+                               length=result.length,
                                filled=filled
                                )

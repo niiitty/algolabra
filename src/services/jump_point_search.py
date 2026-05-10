@@ -2,6 +2,7 @@ import heapq
 
 from enum import Enum
 from math import sqrt
+from collections import namedtuple
 
 from services.grid_tools import GridTools
 
@@ -15,6 +16,7 @@ class Directions(Enum):
 class JumpPointSearch:
     def __init__(self, grid):
         self.grid = GridTools(grid)
+        self.result = namedtuple("result", ["path", "length", "map"])
 
     def _reconstruct_path(self, came_from: dict, current, start, goal) -> list:
         jump_points = [current]
@@ -158,7 +160,7 @@ class JumpPointSearch:
             if current == goal:
                 path, path_length = self._reconstruct_path(
                     came_from, current, start, goal)
-                return path, path_length, self.grid.drawn_map
+                return self.result(path=path, length=path_length, map=self.grid.drawn_map)
 
             visited.add(current)
 
@@ -182,4 +184,4 @@ class JumpPointSearch:
                         if found not in jump_points:
                             heapq.heappush(jump_points, (f_score[found], found))
 
-        return [], 0, self.grid.drawn_map
+        return self.result(path=[], length=0, map=self.grid.drawn_map)

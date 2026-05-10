@@ -2,6 +2,7 @@ import heapq
 
 from enum import Enum
 from math import sqrt
+from collections import namedtuple
 
 from services.grid_tools import GridTools
 
@@ -14,6 +15,7 @@ class Directions(Enum):
 class AStar:
     def __init__(self, grid):
         self.grid = GridTools(grid)
+        self.result = namedtuple("result", ["path", "length", "map"])
 
     def _reconstruct_path(self, came_from: dict, current):
         total_path = [current]
@@ -46,8 +48,9 @@ class AStar:
             if current in visited:
                 continue
             if current == goal:
-                path, path_length = self._reconstruct_path(came_from, current)
-                return path, path_length, self.grid.drawn_map
+                path, path_length = self._reconstruct_path(came_from, current)              
+                return self.result(path=path, length=path_length, map=self.grid.drawn_map)
+
             visited.add(current)
             self.grid.drawn_map[current[0]][current[1]] = ":"
             neighbouring_nodes = self.grid.get_neighbours(current)
@@ -68,4 +71,4 @@ class AStar:
                     if neighbour not in open_set:
                         heapq.heappush(open_set, (f_score[neighbour], neighbour))
 
-        return [], 0, self.grid.drawn_map
+        return self.result(path=[], length=0, map=self.grid.drawn_map)

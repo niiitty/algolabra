@@ -21,17 +21,17 @@ class ScenarioTester:
         except BaseException as exc:
             raise FileNotFoundError from exc
 
-        for i, row in enumerate(lines[1:]):
+        for i, row in enumerate(lines[::-1][:100]):
+            print(row)
             parts = row.strip().split()
 
-            if 275 > float(parts[8]) > 215:
-                file_dict[i] = {
-                    "start_x": int(parts[4]),
-                    "start_y": int(parts[5]),
-                    "goal_x": int(parts[6]),
-                    "goal_y": int(parts[7]),
-                    "optimal_length": float(parts[8])
-                }
+            file_dict[i] = {
+                "start_x": int(parts[4]),
+                "start_y": int(parts[5]),
+                "goal_x": int(parts[6]),
+                "goal_y": int(parts[7]),
+                "optimal_length": float(parts[8])
+            }
 
         return file_dict
 
@@ -72,31 +72,29 @@ class ScenarioTester:
             goal = (goal_y, goal_x)
 
             start_time = time.perf_counter()
-            a_star_path_length = AStar(grid).a_star_search(start, goal)[1]
+            a_star = AStar(grid).a_star_search(start, goal)
             end_time = time.perf_counter()
             a_star_time += (end_time - start_time)
 
-            if math.isclose(a_star_path_length, optimal_length, rel_tol=1e-6):
+            if math.isclose(a_star.length, optimal_length, rel_tol=1e-6):
                 a_star_correct += 1
             else:
                 a_star_incorrect += 1
 
             start_time = time.perf_counter()
-            jps_path_length = JumpPointSearch(
-                grid).jump_point_search(start, goal)[1]
+            jps = JumpPointSearch(grid).jump_point_search(start, goal)
             end_time = time.perf_counter()
             jps_time += (end_time - start_time)
 
-            if math.isclose(jps_path_length, optimal_length, rel_tol=1e-6):
+            if math.isclose(jps.length, optimal_length, rel_tol=1e-6):
                 jps_correct += 1
             else:
                 jps_incorrect += 1
 
-            if not math.isclose(a_star_path_length,
-                                jps_path_length, rel_tol=1e-6):
+            if not math.isclose(a_star.length, jps.length, rel_tol=1e-6):
                 tests_with_differing_lengths += 1
-                print(a_star_path_length)
-                print(jps_path_length)
+                print(a_star.length)
+                print(jps.length)
             
             if a_star_time < jps_time:
                 a_star_faster += 1
